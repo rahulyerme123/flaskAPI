@@ -13,6 +13,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag flaskapi:latest
+    - name: Build and push the Docker image
+      uses: azure/docker-login@v1
+      with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+      
+    - run:   
+       docker build . --file Dockerfile --tag flaskapi:latest
+       docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/flaskapi:latest
+      
